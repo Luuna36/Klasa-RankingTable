@@ -1,0 +1,38 @@
+<?php
+class RankingTable {
+  private $players;
+  private $scores;
+
+  public function __construct($players) {
+    $this->players = $players;
+    $this->scores = array();
+    foreach ($players as $player) {
+      $this->scores[$player] = array("score" => 0, "games" => 0);
+    }
+  }
+
+  public function recordResult($player, $score) {
+    $this->scores[$player]["score"] += $score;
+    $this->scores[$player]["games"] += 1;
+  }
+
+  public function playerRank($rank) {
+    $sorted_players = $this->players;
+    usort($sorted_players, function($a, $b) {
+      if ($this->scores[$a]["score"] != $this->scores[$b]["score"]) {
+        return $this->scores[$b]["score"] - $this->scores[$a]["score"];
+      } else if ($this->scores[$a]["games"] != $this->scores[$b]["games"]) {
+        return $this->scores[$a]["games"] - $this->scores[$b]["games"];
+      } else {
+        return array_search($a, $this->players) - array_search($b, $this->players);
+      }
+    });
+    return $sorted_players[$rank-1];
+  }
+}
+
+$table = new RankingTable(array('Jan', 'Maks', 'Monika'));
+$table->recordResult('Jan', 2);
+$table->recordResult('Maks', 3);
+$table->recordResult('Monika', 5);
+echo $table->playerRank(1);
